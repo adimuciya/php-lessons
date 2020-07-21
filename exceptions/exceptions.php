@@ -1,84 +1,83 @@
 <?php
-
 function division($a, $b){
-    if ($b == 0){
-        // генерируем исключения
-        //  php.net/manual/ru/spl.exceptions.php
-        //
+    if ($b == 0) {
+        // генерация исключания
+        // throw объект исключения
+        // https://www.php.net/manual/ru/spl.exceptions.php
+
         throw new InvalidArgumentException(
-            'Wrong params, b != 0'
+            "Параметр b не может быть равен 0"
         );
     }
     return $a / $b;
 }
 
-function printName($name) {
-    if (mb_strlen($name) < 4){
-        throw new LengthException(
-            "name не может быть меньше 4 символов"
-        );
+function printName($name){
+    if (mb_strlen($name) < 4) {
+        throw new LengthException("Размер
+        name не должен быть меньше 4 символов");
     }
     echo $name;
 }
 
-// $result = division(4, 0);
-// var_dump($result);
-// printName("Ян");
 $result = division(4, 2);
 var_dump($result);
-printName("Янин\n");
+//$result = division(4, 0);
+//var_dump($result);
+printName("Евгений");
+//printName("Ян");
 
 // обработка исключений
 try {
     // потенциально опасный код
+    printName("Ян"); // LengthException
     $result = division(4, 0);
-    printName("Ян");
     // $user = new User("qwe"); // InvalidArgumentException
-
+    // OutOfBoundsException
+} catch (OutOfRangeException | LengthException $exception) {
+    // блок перехвата исключения
+    // несколько блоков catch используются для того, чтобы
+    // обрабатывать исключения разного типа разными способами
+    echo "Обработка LengthException или OutOfRangeException";
+    var_dump($exception->getTraceAsString());
 } catch (InvalidArgumentException $exception) {
-    // блок перехвата исключений
     echo "Обработка InvalidArgumentException\n";
-    var_dump($exception ->getTraceAsString());
 }
-catch (OutOfRangeException | LengthException $exception){
-    echo "Обработка LengthException или OutOfRangeException\n";
-}
-catch (Exception $exception){
-    echo "Обработка всего остального\n";
-
-} finally {
-    // блок выполнится в любом случае
-    // даже если всё крашнется
-    // создается для закрытия ресурсов
-    // (закрытие файлов, сетевого соединения и т.д.)
+//catch (Exception $exception) {
+//    // catch (Exception $exception) - обрабатывает
+//    // Exception и всех его наследников
+//    echo "Обработка всего остального";
+//}
+finally {
+    // блок выполнится в случае любого исключения, даже того,
+    // который не обрабатывается в блоке catch
+    // создается для закрытия ресурсов (например, закрытие файлов,
+    // закрытие сетевого соединения и тд)
     echo "finally\n";
 }
 // $result
 // $user->printLogin();
-var_dump("код дальше");
+var_dump("Код дальше");
 
-class ProjectException extends Exception{
+// class_exists();
+// method_exists();
+// function_exists();
 
-
-    /**
-     * ProjectException constructor.
-     * @param $message
-     * @param $code
-     * @param $previous
-     */
+class ProjectException extends Exception {
+    // message, code
     public function __construct($message, $code, Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
     }
-    public function getInfo(){
-        return $this->message;
+    // метод нельзя переопределить в дочернем классе
+    final public function getLogInfo(){
+        return $this->message . ' ' . $this->code;
     }
 }
 
-function eventDivision($a){
-    if ($a % 2 !== 0){
-        throw new ProjectException("Oshibka", 12);
+function evenDivision($a){
+    if ($a % 2 !== 0) {
+        throw new ProjectException("Ошибка!", 12);
     }
     return $a / 2;
-
 }
